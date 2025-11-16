@@ -16,7 +16,6 @@
   wsl = {
     enable = true;
     defaultUser = "dev";
-    interop.sshForwardAgent.enable = true;
   };
 
   # Set your time zone
@@ -56,7 +55,7 @@
   # --- Docker Configuration ---
   virtualisation.docker = {
     enable = true;
-    daemon.config = {
+    daemon.settings = {
       tls = false; # Overrides Zscaler
       debug = true;
       "insecure-registries" = [ "docker.io" ];
