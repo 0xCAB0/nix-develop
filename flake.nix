@@ -47,7 +47,7 @@
                 # You can pass special args to home-manager configs if needed
               };
               # Define our user's home-manager config
-              home-manager.users.dev = import ./home.nix;
+              home-manager.users.dev = import ./user-template/home.nix;
             }
           ];
         };
