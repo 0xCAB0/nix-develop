@@ -57,8 +57,25 @@
         nixosConfigurations.wsl-dev-env = nixosSystem;
 
         # This packages the configuration as a WSL tarball
-        # Build it with: nix build .#wsl-tarball
-        packages.wsl-tarball = nixosSystem.config.system.build.wslTarball;
+        # Build it with: sudo nix run .#wsl-tarball
+        packages.wsl-tarball = nixpkgs.legacyPackages.${system}.writeShellScriptBin "wsl-tarball-builder" ''
+          set -e
+          
+          # Create output directory
+          mkdir -p output
+          
+          # Run the tarball builder
+          ${nixosSystem.config.system.build.tarballBuilder}/bin/nixos-wsl-tarball-builder
+          
+          # Move the generated tarball to output/nixos.wsl
+          if [ -f nixos.wsl ]; then
+            mv nixos.wsl output/nixos.wsl
+            echo "WSL tarball created at: output/nixos.wsl"
+          else
+            echo "Error: nixos.wsl not found after build"
+            exit 1
+          fi
+        '';
         
         # Make it the default package
         # Build it with: nix build

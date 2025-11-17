@@ -1,4 +1,10 @@
-{ pkgs ? import <nixpkgs> {} }:
+{
+  pkgs ? import <nixpkgs> {
+
+    config.allowUnfree = true;
+
+  },
+}:
 
 pkgs.mkShell {
   buildInputs = with pkgs; [
@@ -10,6 +16,7 @@ pkgs.mkShell {
     jq
     curl
     vim
+    claude-code
   ];
 
   shellHook = ''

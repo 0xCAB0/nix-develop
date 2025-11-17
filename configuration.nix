@@ -6,23 +6,8 @@
 
 { config, pkgs, lib, ... }:
 
-let
-  home-manager = builtins.fetchTarball https://github.com/nix-community/home-manager/archive/release-25.05.tar.gz;
-in
 {
-  imports =
-    [
-      (import "${home-manager}/nixos")
-    ];
-
-  users.users.eve.isNormalUser = true;
-  home-manager.users.eve = { pkgs, ... }: {
-    home.packages = [ pkgs.atool pkgs.httpie ];
-    programs.bash.enable = true;
-  
-    home.stateVersion = "25.05";
-
-    # --- NixOS-WSL Configuration ---
+  # --- NixOS-WSL Configuration ---
   wsl = {
     enable = true;
     defaultUser = "dev";
@@ -44,7 +29,7 @@ in
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
-  # Find packages on: https://search.nixos.org/packages
+    # Find packages on: https://search.nixos.org/packages
     # Base tools
     git
     neovim
@@ -56,7 +41,7 @@ in
     bat 
     
     # Development software 
-    nodejs-22_x
+    nodejs_22
     jdk17
   ];
 
@@ -71,19 +56,12 @@ in
   };
 
   # --- Zsh Configuration ---
-  # Managed in zsh.nix
   programs.zsh = {
     enable = true;
     ohMyZsh.enable = true;
   };
 
-  # --- Home Manager Configuration
-  programs.home-manager = {
-    enable = true;
-  };
-  
   # --- Systemd Services ---
-  
   systemd.services."docker" = {
     enable = true;
     wantedBy = [ "multi-user.target" ];
@@ -91,6 +69,5 @@ in
 
   # This value determines the NixOS release version
   system.stateVersion = "25.05"; 
-  };
 }
 

@@ -5,7 +5,12 @@
 {
   # Your personal Git configuration
   programs.git = {
-    userName = "Your Name";
-    userEmail = "your-email@example.com";
+    enable = true;
+    settings = {
+      user = {
+        name = "Your Name";
+        email = "your-email@example.com";
+      };
+    };
   };
 }
