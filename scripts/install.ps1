@@ -1,0 +1,91 @@
+# setup-dev-env.ps1
+# ------------------------------------------------------------------
+# Automated Setup for NixOS-WSL Development Environment
+# ------------------------------------------------------------------
+
+$ErrorActionPreference = "Stop"
+
+# --- Configuration Variables ---
+$DistroName = "NixOS-Dev"
+$InstallDir = "C:\WSL\$DistroName"
+$TarballUrl = "https://github.com/acabociu-ntt/nix-develop/releases/latest/download/nix-develop.wsl"
+$TarballFile = "$env:TEMP\nix-develop.wsl"
+$RepoUrl = "https://github.com/acabociu-ntt/nix-develop.git"
+$ConfigBranch = "user_template"
+$User = "dev" # Default user defined in your main flake
+
+Write-Host "🚀 Starting Development Environment Setup..." -ForegroundColor Cyan
+
+# 1. Check for existing installation
+if (wsl --list --quiet | Select-String -Pattern $DistroName) {
+    Write-Warning "Distro '$DistroName' is already installed."
+    $confirmation = Read-Host "Do you want to delete it and reinstall? (y/N)"
+    if ($confirmation -ne 'y') {
+        Write-Host "Aborting setup."
+        exit
+    }
+    Write-Host "Unregistering existing distro..." -ForegroundColor Yellow
+    wsl --unregister $DistroName
+}
+
+# 2. Create Installation Directory
+if (-not (Test-Path -Path $InstallDir)) {
+    New-Item -ItemType Directory -Path $InstallDir | Out-Null
+    Write-Host "Created directory: $InstallDir" -ForegroundColor Green
+}
+
+# 3. Download the WSL Tarball
+Write-Host "⬇️  Downloading NixOS-WSL image (this may take a moment)..." -ForegroundColor Cyan
+try {
+    Invoke-WebRequest -Uri $TarballUrl -OutFile $TarballFile -UseBasicParsing
+    Write-Host "Download complete." -ForegroundColor Green
+}
+catch {
+    Write-Error "Failed to download image. Please check the URL or your internet connection."
+    exit
+}
+
+# 4. Import the WSL Distro
+Write-Host "📦 Importing NixOS distribution..." -ForegroundColor Cyan
+wsl --import $DistroName $InstallDir $TarballFile --version 2
+Write-Host "Import complete." -ForegroundColor Green
+
+# 5. Bootstrap User Configuration
+# We execute these commands INSIDE the new WSL instance
+Write-Host "🔧 Bootstrapping user configuration from branch '$ConfigBranch'..." -ForegroundColor Cyan
+
+$bootstrapCmd = "
+    mkdir -p ~/.config && 
+    echo 'Cloning user template...' && 
+    if [ ! -d ~/.config/nixos ]; then
+        git clone -b $ConfigBranch $RepoUrl ~/.config/nixos
+    else
+        echo 'Config directory already exists, skipping clone.'
+    fi
+"
+
+# Execute the bootstrap command as the 'dev' user
+wsl -d $DistroName -u $User -- sh -c $bootstrapCmd
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "Configuration cloned successfully to ~/.config/nixos" -ForegroundColor Green
+} else {
+    Write-Error "Failed to clone configuration repository."
+}
+
+# 6. Cleanup
+if (Test-Path $TarballFile) {
+    Remove-Item $TarballFile
+    Write-Host "Cleaned up temporary files." -ForegroundColor Gray
+}
+
+# 7. Success Message
+Write-Host "`n✅ Setup Complete!" -ForegroundColor Green
+Write-Host "---------------------------------------------------------"
+Write-Host "To start your new environment, run:"
+Write-Host "   wsl -d $DistroName" -ForegroundColor Yellow
+Write-Host "---------------------------------------------------------"
+Write-Host "Inside, run the following to apply updates in the future:"
+Write-Host "   nix flake update ~/.config/nixos"
+Write-Host "   sudo nixos-rebuild switch --flake ~/.config/nixos#wsl"
+Write-Host "---------------------------------------------------------"
