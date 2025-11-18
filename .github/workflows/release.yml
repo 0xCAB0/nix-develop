@@ -1,0 +1,45 @@
+name: Build WSL tarball and attach to release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix (no-daemon)
+        run: |
+          set -eux
+          curl -L https://nixos.org/nix/install | sh -s -- --no-daemon
+          . /home/runner/.nix-profile/etc/profile.d/nix.sh
+          nix --version
+
+      - name: Build WSL tarball
+        run: |
+          set -eux
+          # Run nix run via sudo while preserving PATH so root can find nix
+          sudo env PATH="$PATH" nix run .#wsl-tarball
+          ls -la output || true
+
+      - name: Upload WSL tarball to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: output/nixos.wsl
+          asset_name: nixos.wsl
+          asset_content_type: application/octet-stream
+
+      - name: Upload PowerShell installer to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: scripts/install.ps1
+          asset_name: install.ps1
+          asset_content_type: application/octet-stream
