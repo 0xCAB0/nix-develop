@@ -8,9 +8,9 @@ $ErrorActionPreference = "Stop"
 # --- Configuration Variables ---
 $DistroName = "NixOS-Dev"
 $InstallDir = "C:\WSL\$DistroName"
-$TarballUrl = "https://github.com/acabociu-ntt/nix-develop/releases/latest/download/nix-develop.wsl"
+$TarballUrl = "https://github.com/0xCAB0/nix-develop/releases/latest/download/nix-develop.wsl"
 $TarballFile = "$env:TEMP\nix-develop.wsl"
-$RepoUrl = "https://github.com/acabociu-ntt/nix-develop.git"
+$RepoUrl = "https://github.com/0xCAB0/nix-develop.git"
 $ConfigBranch = "user_template"
 $User = "dev" # Default user defined in your main flake
 
