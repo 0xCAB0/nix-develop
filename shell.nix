@@ -16,6 +16,7 @@ pkgs.mkShell {
     jq
     curl
     vim
+    act
     # claude-code
   ];
 
