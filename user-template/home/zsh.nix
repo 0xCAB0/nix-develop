@@ -41,7 +41,7 @@
     };
     
     # Additional shell initialization
-    initExtraFirst = ''
+    initContent = ''
       # Set editor to neovim
       export EDITOR=nvim
       
