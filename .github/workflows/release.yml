@@ -28,7 +28,9 @@ jobs:
         run: |
           set -eux
           # Run nix run via sudo while preserving PATH so root can find nix
-          sudo env PATH="$PATH" nix run .#wsl-tarball
+          sudo env PATH="$PATH" nix \
+            --extra-experimental-features 'nix-command flakes' \
+            run .#wsl-tarball
           ls -la output || true
 
       - name: Upload WSL tarball to release
