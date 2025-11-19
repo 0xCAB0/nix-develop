@@ -39,13 +39,16 @@ if (-not (Test-Path -Path $InstallDir)) {
 }
 
 # 3. Download the WSL Tarball
-Write-Host "⬇️  Downloading NixOS-WSL image via curl..." -ForegroundColor Cyan
-& curl.exe -L -o $TarballFile $TarballUrl
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Download failed."
+Write-Host "⬇️  Downloading NixOS-WSL image via BITS..." -ForegroundColor Cyan
+try {
+    Import-Module BitsTransfer
+    Start-BitsTransfer -Source $TarballUrl -Destination $TarballFile -DisplayName "NixOS Download"
+    Write-Host "Download complete." -ForegroundColor Green
+}
+catch {
+    Write-Error "Failed to download image: $_"
     exit
 }
-Write-Host "Download complete." -ForegroundColor Green
 
 # 4. Import the WSL Distro
 Write-Host "📦 Importing NixOS distribution..." -ForegroundColor Cyan
