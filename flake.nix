@@ -38,6 +38,8 @@
             # Import our custom system configuration
             ./configuration.nix
 
+            { nix.settings.sandbox = false; }
+
             # Import the Home Manager module for NixOS
             home-manager.nixosModules.home-manager
             {
