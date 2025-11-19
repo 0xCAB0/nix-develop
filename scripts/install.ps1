@@ -67,20 +67,6 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host "Import complete." -ForegroundColor Green
 
-# 5. Bootstrap User Configuration
-# We execute these commands INSIDE the new WSL instance
-Write-Host "🔧 Bootstrapping user configuration from branch '$ConfigBranch'..." -ForegroundColor Cyan
-
-$bootstrapCmd = "
-    mkdir -p ~/.config && 
-    echo 'Cloning user template...' && 
-    if [ ! -d ~/.config/nixos ]; then
-        git clone -b $ConfigBranch $RepoUrl ~/.config/nixos
-    else
-        echo 'Config directory already exists, skipping clone.'
-    fi
-"
-
 # Execute the bootstrap command as the 'dev' user
 wsl -d $DistroName -u $User -- sh -c $bootstrapCmd
 
@@ -90,7 +76,7 @@ if ($LASTEXITCODE -eq 0) {
     Write-Error "Failed to clone configuration repository."
 }
 
-# 6. Cleanup
+# 5. Cleanup
 if (Test-Path $TarballFile) {
     Remove-Item $TarballFile
     Write-Host "Cleaned up temporary files." -ForegroundColor Gray

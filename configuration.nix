@@ -11,6 +11,20 @@
   wsl = {
     enable = true;
     defaultUser = "dev";
+    wslConf = {
+      wsl2 = {
+        guiApplications = false;
+      };  
+      boot.command = ''
+        mkdir -p ~/.config && 
+        echo 'Cloning user template...' && 
+        if [ ! -d ~/.config/nixos ]; then
+            git clone -b $ConfigBranch $RepoUrl ~/.config/nixos
+        else
+            echo 'Config directory already exists, skipping clone.'
+        fi
+      '';
+    };
   };
 
   # Set your time zone
