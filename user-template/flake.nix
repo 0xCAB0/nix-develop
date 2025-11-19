@@ -9,7 +9,7 @@
     home-manager.url = "github:nix-community/home-manager";
 
     dev-env = {
-      url = "github:your-org/nixos-dev-env"; # <-- TODO: Change to your repo URL
+      url = "github:0xCAB0/nix-develop";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
