@@ -11,14 +11,12 @@ $ErrorActionPreference = "Stop"
 $DistroName = "NixOS-Dev"
 $InstallDir = "C:\WSL\$DistroName"
 $TarballUrl = "https://github.com/0xCAB0/nix-develop/releases/latest/download/nix-develop.wsl"
-$TarballFile = "$env:TEMP\nix-develop.wsl"
+$TarballFile = "$InstallDir\nix-develop.wsl"
 $RepoUrl = "https://github.com/0xCAB0/nix-develop.git"
 $ConfigBranch = "user_template"
 $User = "dev" # Default user defined in your main flake
 
 Write-Host "🚀 Starting Development Environment Setup..." -ForegroundColor Cyan
-
-
 
 # 1. Check for existing installation
 if (wsl --list --quiet | Select-String -Pattern $DistroName) {
@@ -39,17 +37,23 @@ if (-not (Test-Path -Path $InstallDir)) {
 }
 
 # 3. Download the WSL Tarball
-Write-Host "⬇️  Downloading NixOS-WSL image via BITS..." -ForegroundColor Cyan
-try {
-    Import-Module BitsTransfer
-    Start-BitsTransfer -Source $TarballUrl -Destination $TarballFile -DisplayName "NixOS Download"
-    Write-Host "Download complete." -ForegroundColor Green
+Write-Host "⬇️  Downloading NixOS-WSL image..." -ForegroundColor Cyan
+
+# Clean up if a partial file exists from a failed run
+if (Test-Path $TarballFile) {
+    Write-Warning "Found existing file, removing..."
+    Remove-Item $TarballFile -Force
 }
-catch {
-    Write-Error "Failed to download image: $_"
+
+# Use curl.exe (Built-in to Windows 10/11 and runs as current user, bypassing BITS permission issues)
+& curl.exe -L -o $TarballFile $TarballUrl
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Download failed. Check your internet connection."
     exit
 }
 
+Write-Host "Download complete." -ForegroundColor Green
 # 4. Import the WSL Distro
 Write-Host "📦 Importing NixOS distribution..." -ForegroundColor Cyan
 wsl --import $DistroName $InstallDir $TarballFile --version 2
