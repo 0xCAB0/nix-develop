@@ -46,7 +46,7 @@ if (Test-Path $TarballFile) {
 }
 
 # Use curl.exe (Built-in to Windows 10/11 and runs as current user, bypassing BITS permission issues)
-& curl.exe -L -o $TarballFile $TarballUrl
+curl.exe -L -o $TarballFile $TarballUrl
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Download failed. Check your internet connection."
@@ -54,9 +54,17 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "Download complete." -ForegroundColor Green
+
 # 4. Import the WSL Distro
+
 Write-Host "📦 Importing NixOS distribution..." -ForegroundColor Cyan
+
 wsl --import $DistroName $InstallDir $TarballFile --version 2
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to import the WSL distribution."
+    exit
+}
 Write-Host "Import complete." -ForegroundColor Green
 
 # 5. Bootstrap User Configuration
