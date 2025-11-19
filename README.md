@@ -80,6 +80,11 @@ nix-develop/
 
 The installer automates:
 1. WSL distro installation from GitHub releases
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "iwr 'https://raw.githubusercontent.com/0xCAB0/nix-develop/refs/heads/main/scripts/install.ps1' | iex"
+```
+
 2. User configuration bootstrap from template branch
 3. Environment setup and validation
 

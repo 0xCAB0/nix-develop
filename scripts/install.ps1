@@ -5,6 +5,8 @@
 
 $ErrorActionPreference = "Stop"
 
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 # --- Configuration Variables ---
 $DistroName = "NixOS-Dev"
 $InstallDir = "C:\WSL\$DistroName"
@@ -15,6 +17,8 @@ $ConfigBranch = "user_template"
 $User = "dev" # Default user defined in your main flake
 
 Write-Host "🚀 Starting Development Environment Setup..." -ForegroundColor Cyan
+
+
 
 # 1. Check for existing installation
 if (wsl --list --quiet | Select-String -Pattern $DistroName) {
@@ -35,15 +39,13 @@ if (-not (Test-Path -Path $InstallDir)) {
 }
 
 # 3. Download the WSL Tarball
-Write-Host "⬇️  Downloading NixOS-WSL image (this may take a moment)..." -ForegroundColor Cyan
-try {
-    Invoke-WebRequest -Uri $TarballUrl -OutFile $TarballFile -UseBasicParsing
-    Write-Host "Download complete." -ForegroundColor Green
-}
-catch {
-    Write-Error "Failed to download image. Please check the URL or your internet connection."
+Write-Host "⬇️  Downloading NixOS-WSL image via curl..." -ForegroundColor Cyan
+& curl.exe -L -o $TarballFile $TarballUrl
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Download failed."
     exit
 }
+Write-Host "Download complete." -ForegroundColor Green
 
 # 4. Import the WSL Distro
 Write-Host "📦 Importing NixOS distribution..." -ForegroundColor Cyan
