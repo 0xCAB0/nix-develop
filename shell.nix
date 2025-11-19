@@ -16,7 +16,7 @@ pkgs.mkShell {
     jq
     curl
     vim
-    claude-code
+    # claude-code
   ];
 
   shellHook = ''
