@@ -45,11 +45,11 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = {
-                # You can pass special args to home-manager configs if needed
-              };
-              # Define our user's home-manager config
-              home-manager.users.dev = import ./user-template/home.nix;
+              home-manager.useUserConfiguration = true;
+              
+              # You can still pass special args to the user's home.nix
+              home-manager.extraSpecialArgs = {
+              };
             }
           ];
         };
