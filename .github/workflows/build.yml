@@ -1,0 +1,25 @@
+name: Build WSL tarball and attach to release
+
+on:
+  push:
+    branches: main
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
+      - name: Build WSL tarball
+        run: |
+          set -eux
+          sudo rm -rf /homeless-shelter
+          sudo -E env "PATH=$PATH" nix run --impure .#wsl-tarball
+          ls -la output || true
