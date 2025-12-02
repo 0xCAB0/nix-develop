@@ -1,202 +1,116 @@
-# NixOS-WSL Development Environment
+# Personal NixOS-WSL Configuration
 
-A standardized NixOS-WSL development environment that provides a consistent, reproducible setup for development teams. This project creates a distributable WSL tarball with pre-configured development tools and allows individual user customization.
+This is your personal configuration template for the NixOS-WSL development environment. This directory contains your user-specific settings that will be applied on top of the team's base configuration.
 
-## Features
+## Quick Start
 
-- **Standardized Environment**: Consistent development setup across all team members
-- **User Customization**: Personal configuration template for individual preferences
-- **Docker Support**: Pre-configured Docker with custom daemon settings
-- **Development Tools**: Node.js 22, JDK 17, Git, Neovim, and essential utilities
-- **Shell Environment**: Zsh with Oh My Zsh and useful plugins
-- **Automated Distribution**: PowerShell installer for easy deployment
+After installing the WSL distribution, this configuration is automatically cloned to `~/.config/nixos` in your WSL environment.
 
-## Quick Start for Maintainers
+### First-Time Setup
 
-### Prerequisites
+1. **Update your personal information**:
+   ```bash
+   cd ~/.config/nixos
+   nano home/git.nix  # Update your name and email
+   ```
 
-- Nix with flakes enabled
-- `just` command runner
-- `sudo` access for tarball building
+2. **Add your personal packages**:
+   ```bash
+   nano home/packages.nix  # Add packages you need
+   ```
 
-### Building the WSL Tarball
+3. **Apply your configuration**:
+   ```bash
+   nix flake update ~/.config/nixos
+   sudo nixos-rebuild switch --flake ~/.config/nixos#wsl
+   ```
 
-```bash
-# Build the WSL tarball
-just build-tar
-
-# The tarball will be created at: output/nixos.wsl
-```
-
-### Available Commands
-
-```bash
-just build-tar    # Build WSL tarball
-just clean        # Remove output directory
-just info         # Show build information
-```
-
-## Project Structure
+## File Structure
 
 ```
-nix-develop/
-├── flake.nix              # Main flake configuration
-├── configuration.nix      # System-level configuration
-├── shell.nix              # Development shell
-├── Justfile               # Build commands
-├── scripts/
-│   └── install.ps1        # PowerShell installer
-└── user-template/         # User configuration template
-    ├── flake.nix          # User's personal flake
-    ├── home.nix           # Home Manager configuration
-    ├── README.md          # User documentation
-    └── home/
-        ├── git.nix        # Git configuration template
-        ├── zsh.nix        # Zsh configuration
-        └── packages.nix   # Personal packages template
+~/.config/nixos/
+├── flake.nix          # Your personal flake configuration
+├── home.nix           # Your home-manager configuration
+└── home/
+    ├── git.nix        # Your Git configuration
+    ├── zsh.nix        # Your Zsh configuration
+    └── packages.nix   # Your personal packages
 ```
 
-## System Configuration
+## Customization
 
-### Base Packages (`configuration.nix`)
-- **Development**: Node.js 22, JDK 17, Git, Neovim
-- **Shell Tools**: Zsh, Bat, Curl, Wget
-- **System**: Docker with custom settings
-
-### WSL Configuration
-- Default user: `dev`
-- Sudo without password for wheel group
-- Time zone: Europe/Madrid (configurable)
-- Docker enabled with custom daemon settings
-
-### Home Manager Integration
-- User-specific configurations via `user-template/`
-- Git, Zsh, and package customization
-- Automatic deployment to user's home directory
-
-## Distribution
-
-### PowerShell Installer (`scripts/install.ps1`)
-
-The installer automates:
-1. WSL distro installation from GitHub releases
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -Command "iwr 'https://raw.githubusercontent.com/0xCAB0/nix-develop/refs/heads/main/scripts/install.ps1' | iex"
-```
-
-2. User configuration bootstrap from template branch
-3. Environment setup and validation
-
-**Configuration Variables**:
-```powershell
-$DistroName = "NixOS-Dev"
-$InstallDir = "C:\WSL\$DistroName"
-$TarballUrl = "https://github.com/acabociu-ntt/nix-develop/releases/latest/download/nix-develop.wsl"
-$ConfigBranch = "user_template"
-```
-
-### Release Process
-
-1. **Build tarball**: `just build-tar`
-2. **Create GitHub release** with `output/nixos.wsl`
-3. **Update installer URL** if needed
-4. **Test installation** on target systems
-
-## User Workflow
-
-### Initial Setup
-1. Run PowerShell installer
-2. Launch WSL: `wsl -d NixOS-Dev`
-3. Customize configuration in `~/.config/nixos/`
-4. Apply changes: `sudo nixos-rebuild switch --flake ~/.config/nixos#wsl`
-
-### Updates
-Users can update their environment:
-```bash
-nix flake update ~/.config/nixos
-sudo nixos-rebuild switch --flake ~/.config/nixos#wsl
-```
-
-## Development
-
-### Local Testing
-
-```bash
-# Enter development shell
-nix develop
-
-# Test configuration
-nix flake check
-
-# Build and test tarball
-just build-tar
-```
-
-### Adding System Packages
-
-Edit `configuration.nix`:
+### Git Configuration (`home/git.nix`)
+Update your Git settings:
 ```nix
-environment.systemPackages = with pkgs; [
-  # Add new system-wide packages here
-  new-package
+programs.git = {
+  enable = true;
+  settings = {
+    user = {
+      name = "Your Name";
+      email = "your-email@company.com";
+    };
+  };
+};
+```
+
+### Personal Packages (`home/packages.nix`)
+Add tools you need:
+```nix
+home.packages = with pkgs; [
+  sl              # Fun steam locomotive
+  htop            # System monitor
+  ripgrep         # Fast grep alternative
+  # Add your packages here
 ];
 ```
 
-### Modifying User Template
+### Zsh Configuration (`home/zsh.nix`)
+The Zsh configuration is pre-configured with Oh My Zsh and useful plugins. You can customize:
+- Aliases in `shellAliases`
+- Additional shell initialization in `initExtraFirst`
 
-Update files in `user-template/`:
-- `home.nix` - Main home configuration
-- `home/*.nix` - Specific tool configurations
+## Updating Your Environment
 
-### Docker Configuration
+### Update Packages
+```bash
+# Update flake inputs
+nix flake update ~/.config/nixos
 
-Docker is pre-configured with:
-- TLS disabled (for Zscaler compatibility)
-- Debug mode enabled
-- Insecure registry: docker.io
+# Rebuild system
+sudo nixos-rebuild switch --flake ~/.config/nixos#wsl
+```
+
+### Add New Packages
+1. Edit `home/packages.nix`
+2. Run `sudo nixos-rebuild switch --flake ~/.config/nixos#wsl`
+
+## Team Configuration
+
+Your personal configuration builds on top of the team's base configuration which includes:
+- Docker with custom settings
+- Node.js 22 and JDK 17
+- Essential development tools (git, neovim, curl, wget)
+- Zsh with Oh My Zsh
 
 ## Troubleshooting
 
-### Build Issues
-
+### Configuration Errors
+If you encounter errors during rebuild:
 ```bash
-# Check flake syntax
-nix flake check
-
-# Rebuild with trace
-nix build --show-trace
-
-# Clean and rebuild
-just clean && just build-tar
+# Check configuration syntax
+nix flake check ~/.config/nixos
 ```
 
-### Common Problems
-
-1. **Git tree dirty warning**: Commit changes before building
-2. **Permission errors**: Ensure sudo access for tarball builder
-3. **Package conflicts**: Check for duplicate package definitions
-
-### Debugging
-
+### Reset to Default
+If you need to reset your configuration:
 ```bash
-# Check system configuration
-nix eval .#nixosConfigurations.wsl-dev-env.config.system.build
-
-# Test in development shell
-nix develop
+cd ~/.config/nixos
+git checkout .
+sudo nixos-rebuild switch --flake ~/.config/nixos#wsl
 ```
 
-## Contributing
-
-1. Make changes to configuration files
-2. Test locally with `just build-tar`
-3. Update documentation if needed
-4. Create pull request with changes
-
-## Resources
+## Getting Help
 
 - **NixOS Manual**: https://nixos.org/manual/nixos/stable/
-- **NixOS-WSL**: https://github.com/nix-community/NixOS-WSL
-- **Home Manager**: https://github.com/nix-community/home-manager
+- **Home Manager Manual**: https://nix-community.github.io/home-manager/
 - **Package Search**: https://search.nixos.org/packages
