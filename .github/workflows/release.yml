@@ -30,7 +30,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: output/nix-develop.wsl
+          asset_path: output/nixos.wsl
           asset_name: nix-develop.wsl
           asset_content_type: application/octet-stream
 
