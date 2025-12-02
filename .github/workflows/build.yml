@@ -1,4 +1,4 @@
-name: Build WSL tarball and attach to release
+name: Build WSL tarball
 
 on:
   push:

@@ -40,17 +40,6 @@
 
             { nix.settings.sandbox = false; }
 
-            # Import the Home Manager module for NixOS
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.useUserConfiguration = true;
-              
-              # You can still pass special args to the user's home.nix
-              home-manager.extraSpecialArgs = {
-              };
-            }
           ];
         };
       in
