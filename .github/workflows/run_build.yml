@@ -1,4 +1,4 @@
-name: Build WSL tarball
+name: Building the nix-develop.wsl artifact
 
 on:
   push:
@@ -8,7 +8,7 @@ permissions:
   contents: write
 
 jobs:
-  build-and-upload:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -23,3 +23,10 @@ jobs:
           sudo rm -rf /homeless-shelter
           sudo -E env "PATH=$PATH" nix run --impure .#wsl-tarball
           ls -la output || true
+
+      - name: Upload Tarball 📤
+        uses: actions/upload-artifact@v5.0.0
+        with:
+          name: tarball
+          path: output/nixos.wsl
+

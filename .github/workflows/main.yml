@@ -1,0 +1,33 @@
+name: "Main Workflow"
+
+on:
+  push:
+    - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build 🛠️
+    uses: ./.github/workflows/run_build.yml
+  
+  tests:
+    name: Tests 🧪
+    uses: ./.github/workflows/run_tests.yml
+    needs:
+      - build
+
+  release:
+    needs:
+      - tests
+    if: github.ref_type == 'tag'
+    steps:
+      - name: Upload assets to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            output/nixos.wsl
+            scripts/install.ps1
+          make_latest: true
+          generate_release_notes: true
