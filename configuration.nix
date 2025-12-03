@@ -15,15 +15,7 @@
       wsl2 = {
         guiApplications = false;
       };  
-      boot.command = ''
-        mkdir -p ~/.config && 
-        echo 'Cloning user template...' && 
-        if [ ! -d ~/.config/nixos ]; then
-            git clone -b user-template https://github.com/0xCAB0/nix-develop ~/.config/nixos
-        else
-            echo 'Config directory already exists, skipping clone.'
-        fi
-      '';
+      boot.command="mkdir -p ~/.config && echo 'Cloning user template...' && if [ ! -d ~/.config/nixos ]; then git clone -b user-template https://github.com/0xCAB0/nix-develop ~/.config/nixos; else echo 'Config directory already exists, skipping clone.'; fi";
     };
   };
 
